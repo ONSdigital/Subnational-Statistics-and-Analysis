@@ -234,6 +234,23 @@ def get_la_names():
     else: #If we already have, just return it.
         return(la_names)
 
+def get_la_names_LAD23():
+    if 'la_names_LAD23' not in globals(): #If we haven't got this read in, read from bigquery.
+        from google.cloud import bigquery
+        client = bigquery.Client(location=" location")
+
+        query = """SELECT LAD23CD, LAD23NM
+        FROM `project.ingest_dataset_name.local_authority_lap_table_name_23`
+        """
+        query_job = client.query(query, location="europe-west2",)
+        la_names_LAD23 = query_job.to_dataframe()
+        la_names_LAD23.rename(columns = {'LAD23CD':'AREA_CODE'}, inplace = True)
+        la_names_LAD23.rename(columns = {'LAD23NM':'LOCAL_AREA_NAME'}, inplace = True)
+       
+        return(la_names_LAD23)
+    else: #If we already have, just return it.
+        return(la_names_LAD23)
+
 #Produces output table for cluster model (alternative to maps)
 #Older function for LAD20 boundaries
 def clusters_and_table_LAD20(metrics, model, optimise=True):
@@ -255,6 +272,20 @@ def clusters_and_table(metrics, model, optimise=True):
     clusters, model = get_clusters(metrics, best_model)
     clusters = relabel_clusters(clusters, best_model)
     la_names = get_la_names()
+    clusters = la_names.merge(clusters, right_on = 'AREACD', left_on = 'AREA_CODE', how='right')
+    clusters['LOCAL_AREA_NAME'] = np.where(clusters['AREACD']=='E06000060', 'Buckinghamshire', clusters['LOCAL_AREA_NAME'])
+    clusters['LOCAL_AREA_NAME'] = np.where(clusters['AREACD']=='E06000061', 'North Northamptonshire', clusters['LOCAL_AREA_NAME'])
+    clusters = clusters.dropna(axis=0, subset=['LOCAL_AREA_NAME'])
+    return(clusters.sort_values(by=['AREACD']).filter(items=['AREACD', 'LOCAL_AREA_NAME', 'Cluster']))
+
+def clusters_and_table_LAD23(metrics, model, optimise=True):
+    import numpy as np
+    import pandas as pd
+    n_clusters = optimise_k(metrics, model)
+    best_model = make_clustering_model(n_clusters=n_clusters)
+    clusters, model = get_clusters(metrics, best_model)
+    clusters = relabel_clusters(clusters, best_model)
+    la_names = get_la_names_LAD23()
     clusters = la_names.merge(clusters, right_on = 'AREACD', left_on = 'AREA_CODE', how='right')
     clusters['LOCAL_AREA_NAME'] = np.where(clusters['AREACD']=='E06000060', 'Buckinghamshire', clusters['LOCAL_AREA_NAME'])
     clusters['LOCAL_AREA_NAME'] = np.where(clusters['AREACD']=='E06000061', 'North Northamptonshire', clusters['LOCAL_AREA_NAME'])
