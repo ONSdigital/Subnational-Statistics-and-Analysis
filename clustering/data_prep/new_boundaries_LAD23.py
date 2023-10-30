@@ -7,17 +7,17 @@ import numpy as np
 #LAD21 lookup (boundaries for 2022 are identical)
 from google.cloud import bigquery
 import pandas as pd
-client = bigquery.Client(location=" europe-west2")
+client = bigquery.Client(location=" location")
 
 query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
 """
 query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
 )  # API request - starts the query
 LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
 
@@ -28,17 +28,17 @@ def covert_transport_LAD21(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
     
@@ -217,17 +217,17 @@ def covert_smoking_LAD21(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
     
@@ -348,17 +348,17 @@ def convert_ut_20(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
 
@@ -385,17 +385,17 @@ def convert_ut_20_northamptonshire(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
 
@@ -425,17 +425,17 @@ def convert_LAD22_to_LAD23(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
     
@@ -512,17 +512,17 @@ def convert_ut_23(metric):
 
     from google.cloud import bigquery
     import pandas as pd
-    client = bigquery.Client(location=" europe-west2")
+    client = bigquery.Client(location=" location")
 
     query = """
     SELECT *
-    FROM `ons-luda-data-prod.ingest_luda.LAD_to_Country_Apr2021_UK` 
+    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
     
     """
     query_job = client.query(
     query,
     # Location must match that of the dataset(s) referenced in the query.
-    location="europe-west2",
+    location="location",
     )  # API request - starts the query
     LAD23 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
 
