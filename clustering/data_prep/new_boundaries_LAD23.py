@@ -439,23 +439,59 @@ def convert_LAD22_to_LAD23(metric):
     )  # API request - starts the query
     LAD21 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
     
-                                                                              
     #North Yorkshire
-    LAD23_n_yorkshire = metric[(metric['AREACD'] == 'E07000163') | (metric['AREACD'] == 'E07000164') | (metric['AREACD'] == 'E07000165')| (metric['AREACD'] == 'E07000166') | (metric['AREACD'] == 'E07000167')| (metric['AREACD'] == 'E07000168') | (metric['AREACD'] == 'E07000169')]
-    LAD23_n_yorkshire['Population'] = np.where(LAD23_n_yorkshire['AREACD']=='E07000163', 56927,
-                                                   np.where(LAD23_n_yorkshire['AREACD']=='E07000164', 90690,
-                                                            np.where(LAD23_n_yorkshire['AREACD']=='E07000165', 162666,
-                                                                     np.where(LAD23_n_yorkshire['AREACD']=='E07000166', 49776,
-                                                                              np.where(LAD23_n_yorkshire['AREACD']=='E07000167', 54707, 
-                                                                                       np.where(LAD23_n_yorkshire['AREACD']=='E07000168', 108736, 
-                                                                                                np.where(LAD23_n_yorkshire['AREACD']=='E07000169',91988, 0)))))))
-    LAD23_n_yorkshire['Prop_of_pop'] = LAD23_n_yorkshire['Population'] / LAD23_n_yorkshire['Population'].sum()
-    LAD23_n_yorkshire['Scaled_Value'] = LAD23_n_yorkshire['Value'] * LAD23_n_yorkshire['Prop_of_pop']
-    LAD23_n_yorkshire['Value'] = LAD23_n_yorkshire['Scaled_Value'].sum()
-    LAD23_n_yorkshire['AREACD'] = 'E06000065'
-    LAD23_n_yorkshire = LAD23_n_yorkshire.filter(items=['AREACD', 'Indicator', 'Value'])
-    LAD23_n_yorkshire = LAD23_n_yorkshire.drop_duplicates()
-                                                                                                                                                     
+
+    #If inactive county value (E10000023) for North Yorkshire exists in dataset, replace it with current UA value (E06000065)
+    if (metric["AREACD"]=="E10000023").any():
+
+        metric.AREACD = metric.AREACD.replace('E10000023', "E06000065")
+        LAD23_n_yorkshire = metric.loc[metric["AREACD"]=="E06000065"]
+
+    else:
+
+        #If inactive county value does not exists for North Yorkshire, calculate current UA value using LAD
+                                                                              
+        #North Yorkshire
+        LAD23_n_yorkshire = metric[(metric['AREACD'] == 'E07000163') | (metric['AREACD'] == 'E07000164') | (metric['AREACD'] == 'E07000165')| (metric['AREACD'] == 'E07000166') | (metric['AREACD'] == 'E07000167')| (metric['AREACD'] == 'E07000168') | (metric['AREACD'] == 'E07000169')]
+        LAD23_n_yorkshire['Population'] = np.where(LAD23_n_yorkshire['AREACD']=='E07000163', 56927,
+                                                    np.where(LAD23_n_yorkshire['AREACD']=='E07000164', 90690,
+                                                                np.where(LAD23_n_yorkshire['AREACD']=='E07000165', 162666,
+                                                                        np.where(LAD23_n_yorkshire['AREACD']=='E07000166', 49776,
+                                                                                np.where(LAD23_n_yorkshire['AREACD']=='E07000167', 54707, 
+                                                                                        np.where(LAD23_n_yorkshire['AREACD']=='E07000168', 108736, 
+                                                                                                    np.where(LAD23_n_yorkshire['AREACD']=='E07000169',91988, 0)))))))
+        LAD23_n_yorkshire['Prop_of_pop'] = LAD23_n_yorkshire['Population'] / LAD23_n_yorkshire['Population'].sum()
+        LAD23_n_yorkshire['Scaled_Value'] = LAD23_n_yorkshire['Value'] * LAD23_n_yorkshire['Prop_of_pop']
+        LAD23_n_yorkshire['Value'] = LAD23_n_yorkshire['Scaled_Value'].sum()
+        LAD23_n_yorkshire['AREACD'] = 'E06000065'
+        LAD23_n_yorkshire = LAD23_n_yorkshire.filter(items=['AREACD', 'Indicator', 'Value'])
+        LAD23_n_yorkshire = LAD23_n_yorkshire.drop_duplicates()
+
+    #Somerset
+
+    #If inactive county value (E10000027) for Somerset exists in dataset, replace it with current UA value (E06000066)
+
+    if (metric["AREACD"]=="E10000027").any():
+
+        metric.AREACD = metric.AREACD.replace('E10000027', "E06000066")
+        LAD23_somerset = metric.loc[metric["AREACD"]=="E06000066"]
+
+    else:
+
+        #If inactive county value does not exists for Somerset, calculate current UA value using LAD 
+
+        LAD23_somerset = metric[(metric['AREACD'] == 'E07000187') | (metric['AREACD'] == 'E07000188') | (metric['AREACD'] == 'E07000189')| (metric['AREACD'] == 'E07000246')]
+        LAD23_somerset['Population'] = np.where(LAD23_somerset['AREACD']=='E07000187', 116089,
+                                                      np.where(LAD23_somerset['AREACD']=='E07000188', 125343,
+                                                               np.where(LAD23_somerset['AREACD']=='E07000189',172671, 
+                                                                        np.where(LAD23_somerset['AREACD']=='E07000246',157445,0))))
+
+        LAD23_somerset['Prop_of_pop'] = LAD23_somerset['Population'] / LAD23_somerset['Population'].sum()
+        LAD23_somerset['Scaled_Value'] = LAD23_somerset['Value'] * LAD23_somerset['Prop_of_pop']
+        LAD23_somerset['Value'] = LAD23_somerset['Scaled_Value'].sum()
+        LAD23_somerset['AREACD'] = 'E06000066'
+        LAD23_somerset = LAD23_somerset.filter(items=['AREACD', 'Indicator', 'Value'])
+        LAD23_somerset = LAD23_somerset.drop_duplicates()                                                                                                                                                 
                                         
     #Cumbria: Cumberland and Westmorland and Furness
     
@@ -482,70 +518,29 @@ def convert_LAD22_to_LAD23(metric):
     LAD23_wf['AREACD'] = 'E06000064'
     LAD23_wf = LAD23_wf.filter(items=['AREACD', 'Indicator', 'Value'])
     LAD23_wf = LAD23_wf.drop_duplicates()   
-        
-    #Somerset
-                                                                              
-    LAD23_somerset = metric[(metric['AREACD'] == 'E07000187') | (metric['AREACD'] == 'E07000188') | (metric['AREACD'] == 'E07000189')| (metric['AREACD'] == 'E07000246')]
-    LAD23_somerset['Population'] = np.where(LAD23_somerset['AREACD']=='E07000187', 116089,
-                                                  np.where(LAD23_somerset['AREACD']=='E07000188', 125343,
-                                                           np.where(LAD23_somerset['AREACD']=='E07000189',172671, 
-                                                                    np.where(LAD23_somerset['AREACD']=='E07000246',157445,0))))
-                                                               
-    LAD23_somerset['Prop_of_pop'] = LAD23_somerset['Population'] / LAD23_somerset['Population'].sum()
-    LAD23_somerset['Scaled_Value'] = LAD23_somerset['Value'] * LAD23_somerset['Prop_of_pop']
-    LAD23_somerset['Value'] = LAD23_somerset['Scaled_Value'].sum()
-    LAD23_somerset['AREACD'] = 'E06000066'
-    LAD23_somerset = LAD23_somerset.filter(items=['AREACD', 'Indicator', 'Value'])
-    LAD23_somerset = LAD23_somerset.drop_duplicates()                                                                        
-
-    #Merge 'new' boundaries into smoking dataset 
+                                                           
+    #Merge 'new' boundaries into dataset 
     LAD23 = metric.merge(LAD23_n_yorkshire, how="outer")
     LAD23 = LAD23.merge(LAD23_cumberland, how="outer")
     LAD23 = LAD23.merge(LAD23_wf, how="outer")
     LAD23 = LAD23.merge(LAD23_somerset, how="outer")
-                                                                         
+
+       #drop old Cumbria code if Cumberland and Westmorland and Furness are present, copy old Cumbria value to Cumberland and Westmorland and Furness if not. 
+    if (LAD23["AREACD"]=="E06000063").any():
+        LAD23 = LAD23.drop(LAD23["AREACD"].loc[LAD23["AREACD"]=="E10000006"].index)
+    else:    
+        LAD23_cumbria = LAD23.loc[LAD23["AREACD"]=="E10000006"]
+
+        new_rows = {
+            "E10000006" : ["E06000063", "E06000064"]
+        }
+
+        LAD23_cumbria = LAD23_cumbria.assign(AREACD=LAD23_cumbria["AREACD"].map(new_rows)).explode("AREACD").reset_index(drop=True)
+        LAD23 = LAD23.merge(LAD23_cumbria, how="outer")
+        LAD23 = LAD23.drop(LAD23["AREACD"].loc[LAD23["AREACD"]=="E10000006"].index)
+                                                                              
     return(LAD23) 
                                            
-#Function to convert data (upper tier only) to LAD23 - North Yorkshire, Somerset, Cumberland and Westmorland and Furness UAs
-def convert_ut_23(metric):
-    import numpy as np
-
-    from google.cloud import bigquery
-    import pandas as pd
-    client = bigquery.Client(location=" location")
-
-    query = """
-    SELECT *
-    FROM `project.ingest_dataset.LAD_to_Country_Apr2021_UK` 
-    
-    """
-    query_job = client.query(
-    query,
-    # Location must match that of the dataset(s) referenced in the query.
-    location="location",
-    )  # API request - starts the query
-    LAD23 = query_job.to_dataframe().filter(items=['LAD21CD', 'LAD21NM'])
-
-    metric_LAD23 = metric.merge(LAD23, left_on = "AREACD", right_on = "LAD21CD", how="outer")
-    metric_LAD23['AREACD'] = metric_LAD23['AREACD'].fillna(metric_LAD23.pop('LAD21CD'))
-    metric_LAD23['Indicator'] = metric_LAD23['Indicator'].interpolate(method='pad')
-    metric_LAD23 = metric_LAD23.filter(items=['AREACD', 'Indicator', 'Value'])
-
-    metric_LAD23_index = metric_LAD23.set_index('AREACD')
-    metric_E10000006 = metric_LAD23_index.at['E10000006', 'Value'] #cumbria
-    metric_E10000023 = metric_LAD23_index.at['E10000023', 'Value'] #north yorkshire
-    metric_E10000027 = metric_LAD23_index.at['E10000027', 'Value'] #somerset
-    metric_LAD23['E10000006'] = metric_E10000006 
-    metric_LAD23['E10000023'] = metric_E10000023
-    metric_LAD23['E10000027'] = metric_E10000027                                       
-
-    metric_LAD23['Value'] = np.where(metric_LAD23['AREACD']=='E06000063', metric_LAD23['E10000006'], metric_LAD23['Value'])
-    metric_LAD23['Value'] = np.where(metric_LAD23['AREACD']=='E06000064', metric_LAD23['E10000006'], metric_LAD23['Value'])
-    metric_LAD23['Value'] = np.where(metric_LAD23['AREACD']=='E06000065', metric_LAD23['E10000023'], metric_LAD23['Value'])
-    metric_LAD23['Value'] = np.where(metric_LAD23['AREACD']=='E06000066', metric_LAD23['E10000027'], metric_LAD23['Value'])
-    metric_LAD23 = metric_LAD23.filter(items=['AREACD', 'Indicator', 'Value'])
-    return(metric_LAD23)
-
 #Creating new metrics at LAD21 and LAD23 level using above functions for use in analysis
 #2021
 travel_public_LAD21 = covert_transport_LAD21(travel_public)
@@ -555,57 +550,34 @@ absenses_LAD21 = convert_ut_20(absenses)
 absenses_cla_LAD21 = convert_ut_20_northamptonshire(absenses_cla)
 smoking_LAD21 = covert_smoking_LAD21(smoking)
 
-#List of metrics using 2022 boundaries at Lower Tier geographies - might be able to remove OHID datasets from list if we ingest them with 2023 boundaries
-                                              
-to_convert_lt = ["gva", "weekly_pay", "employ_rate", "gdi", "broadband", "mobile4g", "ks2", "maths_5", "lit_5", "comm_5", "gcses", "good_schools", "absenses", "absenses_fsm", "absenses_cla", "fe_achievements", "app_start", "app_completion", "nvq", "fe_participation", "female_hle", "male_hle", "adult_obesity", "child_obesity", "year6_obesity", "cancer", "cardio", "satisfaction", "anxiety", "happiness", "worthwhile", "new_houses"]
+#Uncomment datasets if boundary convertion is needed 
 
+# gva_LAD23 = convert_LAD22_to_LAD23(gva)
+# weekly_pay_LAD23 = convert_LAD22_to_LAD23(weekly_pay)                                        
+# employ_rate_LAD23 = convert_LAD22_to_LAD23(employ_rate)                                        
+# gdi_LAD23 = convert_LAD22_to_LAD23(gdi) 
+# broadband_LAD23 = convert_LAD22_to_LAD23(broadband)
+# mobile4g_LAD23 = convert_LAD22_to_LAD23(mobile4g)
+# good_schools_LAD23 = convert_LAD22_to_LAD23(good_schools)
+# app_start_LAD23 = convert_LAD22_to_LAD23(app_start) 
+# app_completion_LAD23 = convert_LAD22_to_LAD23(app_completion) 
+# nvq_LAD23 = convert_LAD22_to_LAD23(nvq) 
+# fe_participation_LAD23 = convert_LAD22_to_LAD23(fe_participation) 
+# cancer_LAD23 = convert_LAD22_to_LAD23(cancer) 
+# cardio_LAD23 = convert_LAD22_to_LAD23(cardio) 
+# satisfaction_LAD23 = convert_LAD22_to_LAD23(satisfaction)
+# anxiety_LAD23 = convert_LAD22_to_LAD23(anxiety)
+# happiness_LAD23 = convert_LAD22_to_LAD23(happiness)
+# worthwhile_LAD23 = convert_LAD22_to_LAD23(worthwhile)
+# new_houses_LAD23 = convert_LAD22_to_LAD23(new_houses) 
+# ks2_LAD23 = convert_LAD22_to_LAD23(ks2)
+# absenses_LAD23 = convert_LAD22_to_LAD23(absenses_LAD21)
+# absenses_cla_LAD23 = convert_LAD22_to_LAD23(absenses_cla_LAD21)
+# fe_achievements_LAD23 = convert_LAD22_to_LAD23(fe_achievements)
+# female_hle_LAD23 = convert_LAD22_to_LAD23(female_hle)
+# male_hle_LAD23 = convert_LAD22_to_LAD23(male_hle)
 
-#Loop to convert all datasets using 2022 boundaries to 2023 - Lower Tier 
-                                           
-#d = {}
-#for luda_metric in to_convert_lt: 
-#    d[luda_metric] = convert_LAD22_to_LAD23(to_convert_lt)
-
-
-gva_LAD23 = convert_LAD22_to_LAD23(gva)
-weekly_pay_LAD23 = convert_LAD22_to_LAD23(weekly_pay)                                        
-employ_rate_LAD23 = convert_LAD22_to_LAD23(employ_rate)                                        
-gdi_LAD23 = convert_LAD22_to_LAD23(gdi) 
-broadband_LAD23 = convert_LAD22_to_LAD23(broadband)
-mobile4g_LAD23 = convert_LAD22_to_LAD23(mobile4g)
-good_schools_LAD23 = convert_LAD22_to_LAD23(good_schools)
-app_start_LAD23 = convert_LAD22_to_LAD23(app_start) #nulls for DAs
-app_completion_LAD23 = convert_LAD22_to_LAD23(app_completion) ##nulls for DAs
-nvq_LAD23 = convert_LAD22_to_LAD23(nvq) 
-fe_participation_LAD23 = convert_LAD22_to_LAD23(fe_participation) ##nulls for DAs
-cancer_LAD23 = convert_LAD22_to_LAD23(cancer) #nulls for the DAs
-cardio_LAD23 = convert_LAD22_to_LAD23(cardio) #nulls for the DAs
-satisfaction_LAD23 = convert_LAD22_to_LAD23(satisfaction)
-anxiety_LAD23 = convert_LAD22_to_LAD23(anxiety)
-happiness_LAD23 = convert_LAD22_to_LAD23(happiness)
-worthwhile_LAD23 = convert_LAD22_to_LAD23(worthwhile)
-new_houses_LAD23 = convert_LAD22_to_LAD23(new_houses) #nulls for the DAs
-
-#2023 boundaries conversion - Upper Tier          
-ks2_LAD23 = convert_ut_23(ks2) #nulls for DAs and 07s
-good_schools_LAD23 = convert_ut_23(good_schools_LAD23)
-absenses_LAD23 = convert_ut_23(absenses)
-absenses_cla_LAD23 = convert_ut_23(absenses_cla)
-fe_achievements_LAD23 = convert_ut_23(fe_achievements)
-app_start_LAD23 = convert_ut_23(app_start_LAD23)
-app_completion_LAD23 = convert_ut_23(app_completion_LAD23)
-fe_participation_LAD23 = convert_ut_23(fe_participation_LAD23)
-female_hle_LAD23 = convert_ut_23(female_hle)
-male_hle_LAD23 = convert_ut_23(male_hle)
-cancer_LAD23 = convert_ut_23(cancer_LAD23)
-cardio_LAD23 = convert_ut_23(cardio_LAD23)
-satisfaction_LAD23 = convert_ut_23(satisfaction_LAD23)
-anxiety_LAD23 = convert_ut_23(anxiety_LAD23)
-happiness_LAD23 = convert_ut_23(happiness_LAD23)
-worthwhile_LAD23 = convert_ut_23(worthwhile_LAD23)
-new_houses_LAD23 = convert_ut_23(new_houses_LAD23)
-
-#transport metrics UTLA 2023
-travel_public_LAD21 = convert_ut_23(travel_public_LAD21)
-travel_car_LAD21 = convert_ut_23(travel_car_LAD21)
-travel_bike_LAD21 = convert_ut_23(travel_bike_LAD21)
+# #transport metrics UTLA 2023
+# travel_public_LAD21 = convert_ut_23(travel_public_LAD21)
+# travel_car_LAD21 = convert_ut_23(travel_car_LAD21)
+# travel_bike_LAD21 = convert_ut_23(travel_bike_LAD21)
