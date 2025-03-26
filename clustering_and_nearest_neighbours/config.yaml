@@ -1,0 +1,145 @@
+local_file_path: ""     # Add filepath to coding folder
+inputs_file_path: ""    #Add filepath to data and lookup inputs
+outputs_file_path: ""   #Add filepath to where you want your outputs stored 
+
+###Shapefile
+# path to the shapefile (no .csv required just file name)
+shapefile: "" 
+#Area column name from shapefile so it can be dropped 
+shapefile_area_col: "" 
+
+### Data  
+# path to the table containing the input data         
+subnational_indicators_table_name: "" 
+
+###Geography lookups
+#path to the upper tier LA lookup for imputation
+upper_tier_to_lower_tier_lookup: "" 
+# Name of the upper tier code column from uppertier to lowertier lookup
+upper_tier_code_column_name: ""  
+# Name of the lower tier code column from uppertier to lowertier lookup
+lower_tier_code_column_name: ""  
+#Name of geography mapper from LTLA to UTLA to ITL1
+Geog_mapper: ""
+# column with ITL1 data required for ITL1 summary table
+ITL1_col: "" 
+# column with LTLA code in mapper
+Area_col: "" 
+# column with LTLA name in mapper
+Area_name_col: "" 
+
+###Imputation lookups
+#Name of census 21 age data table for the boundary changes code
+census_21_table: ""
+#Area table path for boundary changes code
+LAD_area_table: ""
+# Name of the area code column for old LAs
+Area_LAD_col: "" 
+
+#here you specify the indicator colomn name for each of your desired variables
+#the variables currently included are the global model produced in our 2025 publication
+custom_metrics_to_run:
+  - "Employment rate"
+  - "Gross value added per hour worked"
+  - "Business births"
+  - "High growth businesses"
+  - "Median house price"
+  - "Level 3 or above qualifications"
+  - "Cigarette smokers"
+  - "Healthy life expectancy"
+  - "Anxiety"
+  - "Happiness"
+  - "Life satisfaction"
+  - "Gigabit capable broadband"
+  - "4g coverage"
+  - "5g coverage"
+  - "Supermarkets"
+  - "Museums"
+  - "CO2 emissions per capita"
+  - "Not religious"
+  - "White ethnicity population"
+  - "No qualifications" 
+  - "Population density"
+  - "Dependency ratio"
+  - "Mean domestic electricity consumption"
+  - "Population change" 
+  - "Private renters"
+  - "Children in relative poverty"
+  - "Employment in construction"
+  - "Employment in manufacturing" 
+  - "Housing completions"
+  - "Guest nights"
+  - "Gross median weekly pay"
+
+  
+ #This code specifies the method of updating old boundaries to new
+ #For each variable you can choose the denominator and specify a specific
+ #age range if your variables only apply to a specifc age group 
+metric_to_update_boundaries:
+  gva:
+    indicator: "Gross value added per hour worked"
+    start_col: 1
+    denominator: "population"
+  male_HLE:
+    indicator: "Male healthy life expectancy"
+    start_col: 1
+    denominator: "population"
+  female_HLE:
+    indicator: "Female healthy life expectancy"
+    start_col: 1
+    denominator: "population"  
+  employ_rate:
+    indicator: "Employment rate"
+    start_col: 18
+    end_col: 66
+    denominator: "population"
+  gdhi:
+    indicator: "Gross disposable household income"
+    start_col: 1
+    denominator: "population"
+  happiness:
+    indicator: "Happiness"
+    start_col: 18
+    end_col: 102
+    denominator: "population"
+  life_satisfaction:
+    indicator: "Life satisfaction"
+    start_col: 18
+    end_col: 102
+    denominator: "population"
+  anxiety:
+    indicator: "Anxiety"
+    start_col: 18
+    end_col: 102
+    denominator: "population"
+  worthwhile:
+    indicator: "Feeling life is worthwhile"
+    start_col: 18
+    end_col: 102
+    denominator: "population"
+  smoking:
+    indicator: "Cigarette smokers"
+    start_col: 20
+    end_col: 102
+    denominator: "population"
+  level_3_qualifications:
+    indicator: "Level 3 or above qualifications"
+    start_col: 18
+    end_col: 66
+    denominator: "population"
+  inactive_rate:
+    indicator: "Economic inactivity rate"
+    start_col: 18
+    end_col: 66
+    denominator: "population"
+  job_density:
+    indicator: "Job density"
+    start_col: 18
+    end_col: 66
+    denominator: "population"
+  weekly_pay:
+    indicator: "Gross median weekly pay"
+    start_col: 18
+    end_col: 66
+    denominator: "population"
+    
