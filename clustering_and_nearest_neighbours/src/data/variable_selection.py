@@ -33,6 +33,20 @@ def pca_analysis(
         Area_code: str="AREACD",
         threshold: float=0.25,
         ):
+        """
+    Perform PCA analysis on the given DataFrame and generate plots and dataframes for explained variance and feature loadings.
+
+    Parameters:
+    loaded_config (Dict): Configuration dictionary containing the output file path.
+    df (pd.DataFrame): DataFrame containing the data to be analyzed.
+    Area_code (str, optional): Column name to be used as the index for the DataFrame. Default is "AREACD".
+    threshold (float, optional): Threshold for selecting important features based on their loadings. Default is 0.25.
+
+    Returns:
+    pcs (pd.DataFrame): DataFrame containing the principal components and their explained variance ratios.
+    loading_df (pd.DataFrame): DataFrame containing the loadings of each feature for each principal component.
+    important_features (pd.DataFrame): DataFrame containing the features with loadings above the specified threshold.
+        """
         path=loaded_config["outputs_file_path"]
         df = df.set_index(Area_code)
         df.fillna(0, inplace=True)
@@ -67,6 +81,17 @@ def variance_analysis(
         df:pd.DataFrame,
         Area_code: str="AREACD",
                       ):
+        """
+    Perform variance analysis on the given DataFrame and generate a plot for the variance of Min-Max scaled features.
+
+    Parameters:
+    loaded_config (Dict): Configuration dictionary containing the output file path.
+    df (pd.DataFrame): DataFrame containing the data to be analyzed.
+    Area_code (str, optional): Column name to be dropped from the DataFrame. Default is "AREACD".
+
+    Returns:
+    variance (pd.Series): Series containing the variance of each feature after Min-Max scaling.
+    """
         path=loaded_config["outputs_file_path"]
         df = df.drop(Area_code, axis=1)
         scaler = MinMaxScaler()
@@ -85,6 +110,17 @@ def visualize_pairwise_distances(
         df:pd.DataFrame,
         Area_code: str="AREACD",
                       ):
+        """
+    Calculate and visualize pairwise distances between rows in the given DataFrame.
+
+    Parameters:
+    loaded_config (Dict): Configuration dictionary containing the output file path.
+    df (pd.DataFrame): DataFrame containing the data to be analyzed.
+    Area_code (str, optional): Column name to be used as the index for the DataFrame. Default is "AREACD".
+
+    Returns:
+    distances (np.ndarray): Array containing the pairwise distances between rows of the scaled DataFrame.
+    """
         path=loaded_config["outputs_file_path"]
         df = df.set_index(Area_code)
         df.fillna(0, inplace=True)
