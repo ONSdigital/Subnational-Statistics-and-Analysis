@@ -1,10 +1,7 @@
 from typing import Dict, Sequence
-
 import pandas as pd
 import numpy as np
-import re
-
-from utils import get_table_from_path
+from src.utils.utils import get_table_from_path
 
 
 def get_code_column(
@@ -24,7 +21,8 @@ def get_code_column(
     -------
     Name of column with matching substring.
     """
-    #Note use of groupby here as there was a deprecation warning for all(level=1), suggesting groupby(level=1).all() is safer.
+    #Note use of groupby here as there was a deprecation warning for all(level=1), 
+    #suggesting groupby(level=1).all() is safer.
     #But beware that default behaviour of groupby is to sort alphabetically, which we very much don't want!
     col = pd.Index(["AREACD"])
     for column in df.columns:
@@ -107,25 +105,24 @@ def UT_metric_to_LT(
     """
     upper_tier_col= loaded_config["upper_tier_code_column_name"]
     lower_tier_col= loaded_config["lower_tier_code_column_name"]
-    lower_metrics = []
-    area_col = get_code_column(metric)
-    all_UT = get_all_upper_tier_la(upper_to_lower_tier_lookup, upper_tier_col)    
-    for row in range(len(metric)):
-        #Test to see if this a upper tier LA. If it is, replace it with lower tier.
-        if metric.iloc[row].loc[area_col][0] in list(all_UT):
-            lower_metric = metric.reset_index().truncate(row,row).merge(upper_to_lower_tier_lookup,
-                                                                        left_on=area_col[0], right_on=upper_tier_col,how="left")
-            lower_metric = lower_metric.drop(columns=[area_col[0], upper_tier_col])
-            col = lower_metric.pop(lower_tier_col)
-            lower_metric.insert(1, area_col[0], col)
-            lower_metrics.append(lower_metric)
-        else:
-            lower_metric = metric.reset_index().truncate(row,row).merge(upper_to_lower_tier_lookup, 
-                                                                        left_on=area_col[0], right_on=upper_tier_col, how="left")
-            lower_metric = lower_metric.drop(columns=[lower_tier_col, upper_tier_col])
-            lower_metrics.append(lower_metric)
     
-    return pd.concat(lower_metrics)
+    #Se
+    UT_list = upper_to_lower_tier_lookup[upper_tier_col].tolist()
+    UT_metrics_to_join = metric[metric['AREACD'].isin(UT_list)]
+    UT_metrics_to_join.reset_index()
+    upper_to_lower_tier_lookup = upper_to_lower_tier_lookup.rename(columns={upper_tier_col: 'AREACD'})
+    UT_metric_join = upper_to_lower_tier_lookup.merge(UT_metrics_to_join, on='AREACD', how='left')
+    UT_metric = UT_metric_join
+    UT_metric["AREANM"] = ""
+    UT_metric = UT_metric[[lower_tier_col,"AREANM","Indicator", "Period", "Measure", "Unit", "Value"]]
+    UT_metric = UT_metric.rename(columns={lower_tier_col: 'AREACD'})
+    metric = metric.dropna(subset=['Value'])
+    metric = metric[["AREACD", "AREANM","Indicator", "Period", "Measure", "Unit", "Value"]]
+    UT_metric = UT_metric[~UT_metric['AREACD'].isin(metric['AREACD'])]
+    full_metric = pd.concat([metric, UT_metric],ignore_index=True)
+
+    
+    return full_metric
 
 
 def drop_index_column(
@@ -214,13 +211,9 @@ def all_cleaning(
     """
     ut_to_lt_lookup = get_table_from_path(
         table_name=loaded_config["upper_tier_to_lower_tier_lookup"],
-        run_locally=loaded_config["run_locally"],
-        path=loaded_config["local_file_path"],
+        path=loaded_config["inputs_file_path"],
         create_geodataframe=False,
         cols_to_select=[loaded_config["upper_tier_code_column_name"], loaded_config["lower_tier_code_column_name"]],
-        project_name=loaded_config["gcp_project_name"],
-        dataset_name="ingest_luda",
-        project_location=loaded_config["gcp_project_location"],
     )
     #all unique area codes and names
     df_cdlm = df[["AREACD", "AREANM"]]
@@ -235,57 +228,9 @@ def all_cleaning(
     df = drop_index_column(df, col_to_drop='YEAR')
     df = harmonise_area_col_name(df)
     df = ensure_value_numeric(df)
-  #Separates out empty values, imputes and then appends to dataset
-    df_missing_values=df.loc[df["Value"].isna(), ]
-    df_missing_values=df_missing_values.drop("Value", axis = 1)
-    df_missing_values=df_missing_values.merge(df[["AREACD", "Value"]], on = "AREACD", how = "left")
-    df_missing_values=df_missing_values.loc[df_missing_values["Value"].notna(),]
-    df=pd.concat([df, df_missing_values])
-    df=df.merge(df_cdlm,on = ["AREACD", "AREANM"], how = "inner")
-    df=df.loc[df["Value"].notna(), ]
 
     
     return df
-
-def hle_cleaning(
-    loaded_config: Dict,
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    """Cleans data for hle metrics(special case compared to the others).
-
-    Parameters
-    ----------
-    loaded_config
-        Contains the loaded config.
-    df
-        Contains the loaded data.
-
-    Returns
-    -------
-    DataFrame with cleaned data.
-    """
-    ut_to_lt_lookup = get_table_from_path(
-        table_name=loaded_config["upper_tier_to_lower_tier_lookup"],
-        run_locally=loaded_config["run_locally"],
-        path=loaded_config["local_file_path"],
-        create_geodataframe=False,
-        cols_to_select=[loaded_config["upper_tier_code_column_name"], loaded_config["lower_tier_code_column_name"]],
-        project_name=loaded_config["gcp_project_name"],
-        dataset_name="ingest_luda",
-        project_location=loaded_config["gcp_project_location"],
-    )
-    df = UT_metric_to_LT(
-        df,
-        upper_to_lower_tier_lookup=ut_to_lt_lookup,
-        upper_tier_col=loaded_config["upper_tier_code_column_name"],
-        lower_tier_col=loaded_config["lower_tier_code_column_name"],
-    )
-    df = drop_index_column(df)
-    df = drop_index_column(df, col_to_drop='YEAR')
-    df = harmonise_area_col_name(df)
-    df = ensure_value_numeric(df)
-    return df
-
 
 def clean_groups(
     loaded_config: Dict,
@@ -306,75 +251,16 @@ def clean_groups(
     """
 
     for metric in range(len(group)):
-        if metric == "Male healthy life expectancy" or metric == "Female healthy life expectancy":
-            group[metric] = hle_cleaning(loaded_config, group[metric])
-        else:
             group[metric] = all_cleaning(loaded_config, group[metric])
-        
-
+    
     return group
 
 
-def winsorze(
-    df: pd.DataFrame,
-    lower_threshold: float,
-    upper_threshold: float,
-) -> pd.DataFrame:
-    """
-    
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        dataframe containing raw metrics.
-    lower_threshold : float
-        percentile threshold for lower bound in 0-1 format.
-    upper_threshold : float
-        percentile threshold for upper bound in 0-1 format.
-
-    Returns
-    -------
-    df : pd.dataframe
-        dataframe of winsorized data.
-
-    """
-    df = df.set_index("AREACD")
-    df = df.clip(lower=df.quantile(lower_threshold), upper=df.quantile(upper_threshold), axis=1)
-    df = df.reset_index()
-    return df
-    
-
-def get_winsorization_thresholds(
-    df: pd.DataFrame,
-    lower_threshold: float,
-    upper_threshold: float,
-) -> pd.DataFrame:
-    """
-    
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        dataframe containing raw metrics.
-    lower_threshold : float
-        percentile threshold for lower bound in 0-1 format.
-    upper_threshold : float
-        percentile threshold for upper bound in 0-1 format.
-
-    Returns
-    -------
-    df_thresholds : pd.dataframe
-        Dataframe of the winsorization thresholds.
-
-    """
-    df = df.set_index("AREACD")
-    df_thresholds = df.quantile([lower_threshold, upper_threshold])
-    df_thresholds = df_thresholds.reset_index()
-    return df_thresholds
 
 def get_desired_geography(
     loaded_config: Dict,
     df: pd.DataFrame,
+    desired_geography: str,
     geography_col: str,
 ) -> pd.DataFrame:
     """
@@ -397,37 +283,33 @@ def get_desired_geography(
     """
     lookup = get_table_from_path(
         table_name=loaded_config["Geog_mapper"],
-        run_locally=loaded_config["run_locally"],
-        path=loaded_config["local_file_path"],
+        path=loaded_config["inputs_file_path"],
         create_geodataframe=False,
-        cols_to_select=[geography_col],
-        project_name=loaded_config["gcp_project_name"],
-        dataset_name=loaded_config["Geog_mapper"],
-        project_location=loaded_config["gcp_project_location"],
+        cols_to_select=[desired_geography],
     )
+    lookup = lookup[[desired_geography]]
+    lookup = lookup.rename(columns={desired_geography: 'AREACD'})
     df = lookup.merge(df, right_on = 'AREACD', left_on = geography_col, how='left')
     df = df.rename(columns={geography_col: 'AREACD'})
     return df
     
-def get_correlation_matrix(
-    df: pd.DataFrame,
+
+def metrics_to_table(
+        metrics: Sequence[pd.DataFrame]
 ) -> pd.DataFrame:
-    """
-    
+    """Puts metrics into one pivot table.
 
     Parameters
     ----------
-    df : pd.DataFrame
-        The data to be fed into the clustering model.
+    metrics
+        List of DataFrames, each containing a metric.
 
     Returns
     -------
-    df_corr : pd.dataframe
-        A correlation matrix for all selected variables
-
+    metrics: pd.dataframe
+    DataFrame containing all metrics.
     """
-    df = df.set_index("AREACD")
-    df_corr = df.corr()
-    return df_corr
-
-
+    if len(metrics) > 0:
+        metrics = pd.concat(metrics)
+        metrics = pd.pivot_table(metrics, values="Value", columns="Indicator", index="AREACD")
+    return metrics
