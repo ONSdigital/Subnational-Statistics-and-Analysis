@@ -3,7 +3,7 @@ inputs_file_path: ""    #Add filepath to data and lookup inputs
 outputs_file_path: ""   #Add filepath to where you want your outputs stored 
 
 ###Shapefile
-# path to the shapefile (no .csv required just file name)
+# path to the shapefile (no .shp required just file name)
 shapefile: "" 
 #Area column name from shapefile so it can be dropped 
 shapefile_area_col: "" 
