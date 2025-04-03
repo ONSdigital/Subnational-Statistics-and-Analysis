@@ -1,12 +1,12 @@
 import pandas as pd
 from typing import Dict
 
-def percentages(
+def add_percentages(
         data: pd.DataFrame,
         loaded_config: Dict, 
 ) -> pd.DataFrame:
     """
-    
+    This function takes a numerator and denominator column and calculates a percentage, which is added to the data
 
     Parameters
     ----------
@@ -30,13 +30,13 @@ def percentages(
     data["percent"] =  data["percent"].round(1)
     return data
 
-def rates(
+def add_rates(
         data: pd.DataFrame,
         loaded_config: Dict, 
         out_of:float
 ) -> pd.DataFrame:
     """
-    
+    This function takes a numerator and denominator column and calculates a rate, which is added to the data
 
     Parameters
     ----------

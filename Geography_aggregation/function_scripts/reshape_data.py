@@ -8,6 +8,7 @@ def unstack_multiple_values(
     area_col:str = "AREACD",
     )->pd.DataFrame:
     """
+    This function takes a long dataset with multiple value columns and a keep variable and converts it to wide
     
     Parameters
     ----------
@@ -55,7 +56,7 @@ def stitch_time_series(
         data_frames: list,
 ) -> pd.DataFrame:
     """
-    
+    This function takes data for multiple years and joins it together
 
     Parameters
     ----------
@@ -81,7 +82,7 @@ def unstack_data(
         value_cols,
 ) -> pd.DataFrame:
     """
-    
+    This function takes a long dataset with a single value column and pivots it to wide
 
     Parameters
     ----------

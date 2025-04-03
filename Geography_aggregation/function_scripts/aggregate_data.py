@@ -6,7 +6,7 @@ def get_all_desired_geographies(
         loaded_config: Dict,  
 ) -> pd.DataFrame:
     """
-    
+    This function aggregates data from smaller geographies into a list of larger geographies
 
     Parameters
     ----------
@@ -50,7 +50,8 @@ def get_all_desired_geographies_keep_column(
         loaded_config: Dict, 
 ) -> pd.DataFrame:
     """
-    
+    This function aggregates data from smaller geographies into a list of larger geographies
+    This version of the function lets you keep an additional variable (such as time series)
 
     Parameters
     ----------

@@ -3,8 +3,9 @@ from typing import Dict
 
 def update_boundaries(df:pd.DataFrame,
                       loaded_config: Dict,
- ):
+):
     """
+    This function updates data to reflect the latest administrative geography changes
 
     Parameters
     ----------
@@ -68,8 +69,10 @@ def update_boundaries(df:pd.DataFrame,
 
 def update_boundaries_keep_column(df:pd.DataFrame,
                       loaded_config: Dict,
-                      ):
+):
     """
+    This function updates data to reflect the latest administrative geography changes
+    This version of the function lets you keep an additional variable (such as time series)
 
     Parameters
     ----------

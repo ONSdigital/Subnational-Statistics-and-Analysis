@@ -7,7 +7,8 @@ def check_missing_geographies(
         loaded_config: Dict,
 ) -> pd.DataFrame:
     """
-    
+    This funtion provides a list of missing values at the base geography
+    It provides you with all tha aggregated geographies impacted by missingness
 
     Parameters
     ----------
@@ -48,7 +49,7 @@ def export_to_xlsx(
         file_name, 
  ):
     """
-    
+    This function allows the user to export the output of the code
 
     Parameters
     ----------
