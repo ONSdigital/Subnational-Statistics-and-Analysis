@@ -1,0 +1,62 @@
+
+### Config ###
+
+#the config is where you specify file paths, field names and columns to aggregate
+#save the config every time you change information so your code runs with up to date information
+#this information is called in the function scripts and also loaded into the notebook
+
+### File paths and names
+
+### Set the name of your output tables
+outname: ""
+
+### Set the file path to your input folder
+#this folder should include the data you are aggregating and all related lookups
+lu: ""
+
+### Raw data file name
+#file name for the raw data including file type
+#currently set up to be csv, if this changes you will need to update the read function in the notebooks
+rawfile: ""
+
+### Raw data column parameters
+#here you set the value columns that include the data you are aggregating
+#if you are counting a rate or a percentage specify the numerator and denominator column names
+#you also specify the column names for area code and area name within the data
+value_columns: [""]
+numerator_column: ""
+denominator_column: ""
+df_areacode: ""
+df_areaname: ""
+
+#if you have a variable such as time period, which you want to preserve within your data specify here
+#this means that the code keeps this as a category in your final data
+#if you are aggregating time series data it must be stacked with a column marking each period
+#if you don't have a column to preserve, leave this blank
+keep_variable: ""
+
+### Suppression symbols to replace with np.NaN in import
+#this allows us to do numeric operations on the value columns (otherwise it will read the column as str data type)
+#if there is a symbol causing you an issue that isn't included in this list, just add it
+nalist: ["-","*","c",".","..", "#", "!","[x]", "z", " "]
+
+### Boundary changes lookup parameters
+#boundary changes lookup, including obsolete geographies and their new versions assumed to be xlsx format
+#if this changes you will have to update the read functions where it is called in the functions scripts
+#you must specify the column names of the old area names and codes, and the new area names and codes
+boundaryfile: ""
+old_area_code: ""
+old_area_name: ""
+new_area_code: ""
+new_area_name: ""
+
+### Geography aggregation lookup parameters
+#geography aggregation lookup, including lower geography and desired geographies, assumed to be xlsx format
+#if this changes you will have to update the read functions where it is called in the functions scripts
+#also specify the column names for the area name and code of the geography you are aggregating from
+lookupfile: ""
+lookup_lowest_geography_code: ""
+lookup_lowest_geography_name: ""
+
+#list of the column names in the lookup including geography codes you want to aggregate to
+geoglist: [""]
